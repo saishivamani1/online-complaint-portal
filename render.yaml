@@ -7,23 +7,31 @@ services:
     rootDir: backend
 
     buildCommand: |
-      # --- Backend deps ---
+      set -e
+
+      echo "=== Backend deps ==="
       npm ci
 
-      # --- Frontend build ---
+      echo "=== Frontend build (install dev deps) ==="
       cd ../frontend
-      npm ci
-      npm run build -- --configuration=production
+      # Either of the following lines works; pick ONE.
+      # 1) npm v9+:
+      npm ci --include=dev
+      # 2) If your npm doesn't support --include=dev, comment the line above and use:
+      # NPM_CONFIG_PRODUCTION=false npm ci
 
-      # --- Copy built SPA to backend/public ---
-      # Works for Angular dist layouts:
-      #   dist/<projectName>/*
-      #   dist/<projectName>/browser/*  (v16+ with builder)
-      rm -rf ../backend/public
-      mkdir -p ../backend/public
-      cp -R dist/*/browser/* ../backend/public 2>/dev/null || \
-      cp -R dist/*/* ../backend/public 2>/dev/null || \
-      cp -R dist/* ../backend/public
+      npx ng build --configuration=production
+
+      echo "=== Discover Angular dist path from angular.json ==="
+      OUT=$(node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('angular.json','utf8'));const p=Object.keys(j.projects)[0];const o=j.projects[p]?.architect?.build?.options?.outputPath || ('dist/'+p);process.stdout.write(o)")
+      [ -d \"$OUT/browser\" ] && SRC=\"$OUT/browser\" || SRC=\"$OUT\"
+      echo \"Copying from: $SRC\"
+
+      cd ../backend
+      rm -rf public
+      mkdir -p public
+      cp -R ../frontend/$SRC/* public/
+      echo \"Public dir contents:\" && ls -la public | head -n 100
 
     startCommand: npm start
     autoDeploy: true
@@ -31,19 +39,13 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
-      - key: NODE_ENV
-        value: production
-      # Provide these in Render dashboard (not committed)
+      # Tip: you can omit NODE_ENV here; if you keep it, build steps must include dev deps as above.
+      # - key: NODE_ENV
+      #   value: production
+
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
         sync: false
-      # Optional: allow specific origins if you ever split front/back later
       - key: CLIENT_ORIGIN
         sync: false
-
-    # Optional disk (uploads are ephemeral without this). Prefer object storage instead.
-    # disks:
-    #   - name: uploads
-    #     mountPath: /opt/render/project/src/uploads
-    #     sizeGB: 1

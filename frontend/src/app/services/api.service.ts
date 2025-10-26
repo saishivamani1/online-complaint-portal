@@ -28,9 +28,17 @@ export class ApiService {
   }
 
   // --- Auth (no auth header needed) ---
-  login(data: { email: string; password: string }): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.base}/auth/login`, data /* , { withCredentials: true } if using cookies */);
-  }
+  // frontend/src/app/services/api.service.ts
+login(data: { email: string; password: string }): Observable<{ 
+  token: string; 
+  user?: { name?: string; email?: string; role?: string; _id?: string } 
+}> {
+  return this.http.post<{ token: string; user?: { name?: string; email?: string; role?: string; _id?: string } }>(
+    `${this.base}/auth/login`,
+    data
+  );
+}
+
   register(data: { name: string; email: string; password: string; role?: string }): Observable<any> {
     return this.http.post(`${this.base}/auth/register`, data);
   }

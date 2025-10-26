@@ -1,0 +1,25 @@
+<h2>Welcome{{ userName ? ', ' + userName : '' }} 👋</h2>
+<h3>My Complaints</h3>
+
+<a class="btn" routerLink="/new">+ New complaint</a>
+
+<div *ngIf="!complaints?.length" class="card"><em>No complaints yet. Create one to get started.</em></div>
+
+<div *ngFor="let c of complaints" class="card">
+  <div class="flex between center">
+    <h3 style="margin:0">
+      <a (click)="open(c)" style="text-decoration:none; cursor:pointer">
+        {{ c.title }}
+      </a>
+      — <span class="status {{c.status}}">{{ c.status }}</span>
+    </h3>
+    <div class="actions">
+      <button (click)="open(c)">View</button>
+      <button *ngIf="canDelete(c)" class="danger" (click)="remove(c._id)">Delete</button>
+    </div>
+  </div>
+
+  <p>{{ c.description }}</p>
+  <img *ngIf="c.photo" [src]="'/uploads/' + c.photo" width="220" style="border-radius:10px"/>
+  <small>Filed: {{ c.createdAt | date:'medium' }}</small>
+</div>

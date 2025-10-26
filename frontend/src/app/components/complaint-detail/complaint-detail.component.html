@@ -1,0 +1,12 @@
+<div *ngIf="c" class="card">
+    <h2>{{c.title}} <span class="status {{c.status}}">{{c.status}}</span></h2>
+    <p>{{c.description}}</p>
+    <p><strong>Category:</strong> {{c.category}} | <strong>Location:</strong> {{c.location || '—'}}</p><img
+        *ngIf="c.photo" [src]="'/uploads/' + c.photo" width="300" style="border-radius:10px" />
+    <h3>Updates</h3>
+    <div *ngIf="c.updates?.length; else noUp">
+        <ul>
+            <li *ngFor="let u of c.updates">{{u.at | date:'short'}} — {{u.message}}</li>
+        </ul>
+    </div><ng-template #noUp><em>No updates yet.</em></ng-template>
+</div>

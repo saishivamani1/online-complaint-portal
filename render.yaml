@@ -1,0 +1,49 @@
+# render.yaml — single web service (backend serves Angular build)
+services:
+  - type: web
+    name: online-complaint-portal
+    env: node
+    plan: free
+    rootDir: backend
+
+    buildCommand: |
+      # --- Backend deps ---
+      npm ci
+
+      # --- Frontend build ---
+      cd ../frontend
+      npm ci
+      npm run build -- --configuration=production
+
+      # --- Copy built SPA to backend/public ---
+      # Works for Angular dist layouts:
+      #   dist/<projectName>/*
+      #   dist/<projectName>/browser/*  (v16+ with builder)
+      rm -rf ../backend/public
+      mkdir -p ../backend/public
+      cp -R dist/*/browser/* ../backend/public 2>/dev/null || \
+      cp -R dist/*/* ../backend/public 2>/dev/null || \
+      cp -R dist/* ../backend/public
+
+    startCommand: npm start
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production
+      # Provide these in Render dashboard (not committed)
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      # Optional: allow specific origins if you ever split front/back later
+      - key: CLIENT_ORIGIN
+        sync: false
+
+    # Optional disk (uploads are ephemeral without this). Prefer object storage instead.
+    # disks:
+    #   - name: uploads
+    #     mountPath: /opt/render/project/src/uploads
+    #     sizeGB: 1

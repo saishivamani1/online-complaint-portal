@@ -1,0 +1,27 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn.lock
+pnpm-lock.yaml
+
+# Env
+.env
+.env.*.local
+backend/.env
+frontend/.env
+
+# Angular build
+frontend/dist/
+# Backend public build (we'll generate on Render)
+backend/public/
+
+# Logs
+logs/
+*.log
+*.pid
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

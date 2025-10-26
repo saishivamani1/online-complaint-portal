@@ -1,0 +1,43 @@
+<h2>Authority Dashboard</h2>
+<div class="card">
+  <div class="flex">
+    <select [(ngModel)]="filterStatus">
+      <option value="">All statuses</option>
+      <option value="submitted">Submitted</option>
+      <option value="in_progress">In progress</option>
+      <option value="resolved">Resolved</option>
+      <option value="rejected">Rejected</option>
+    </select>
+    <select [(ngModel)]="filterCategory">
+      <option value="">All categories</option>
+      <option value="sanitation">Sanitation</option>
+      <option value="roads">Roads</option>
+      <option value="water">Water</option>
+      <option value="electricity">Electricity</option>
+      <option value="other">Other</option>
+    </select>
+    <button class="btn" (click)="load()">Apply</button>
+  </div>
+</div>
+
+<table class="table card">
+  <thead>
+    <tr><th>Title</th><th class="hide-sm">Category</th><th>Status</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let c of complaints">
+      <td>{{c.title}}</td>
+      <td class="hide-sm">{{c.category}}</td>
+      <td><span class="status {{c.status}}">{{c.status}}</span></td>
+      <td>
+        <select [disabled]="saving[c._id]" (change)="updateStatus(c, $event.target.value)">
+          <option value="" disabled selected>Change…</option>
+          <option value="submitted">Submitted</option>
+          <option value="in_progress">In progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </td>
+    </tr>
+  </tbody>
+</table>

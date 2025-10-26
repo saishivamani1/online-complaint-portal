@@ -1,0 +1,21 @@
+<nav class="top">
+  <div class="container row">
+    <a class="brand" routerLink="/">Online Complaint Portal</a>
+    <div class="flex" *ngIf="isLoggedIn(); else loggedOut">
+      <a routerLink="/my" class="hide-sm">My Complaints</a>
+      <a routerLink="/new" class="hide-sm">New</a>
+      <a routerLink="/admin" class="hide-sm">Authority</a>
+      <a (click)="logout()" style="cursor:pointer">Logout</a>
+    </div>
+    <ng-template #loggedOut>
+      <div class="flex">
+        <a routerLink="/login">Login</a>
+        <a routerLink="/register">Register</a>
+      </div>
+    </ng-template>
+  </div>
+</nav>
+
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
